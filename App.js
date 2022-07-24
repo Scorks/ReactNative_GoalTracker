@@ -1,39 +1,43 @@
 import { v4 as uuid } from "uuid";
 import { useState } from "react";
 import React from "react";
-import { StyleSheet, Text, View, TextInput, Button } from "react-native"; //b built-in components react-native exposes to use in JSS code
+import { StyleSheet, View, TextInput, Button, FlatList } from "react-native"; //b built-in components react-native exposes to use in JSS code
+
+import GoalItem from "./components/GoalItem";
+import GoalInput from "./components/GoalInput";
 
 export default function App() {
-  const [enteredGoalText, setEnteredGoalText] = useState("");
   const [courseGoals, setCourseGoals] = useState([]);
 
-  // we get the parameter 'enteredText' automatically from React Native
-  function goalInputHandler(enteredText) {
-    setEnteredGoalText(enteredText);
-    // responsible for fetching user input as the user types into the textbox
+  function addGoalHandler(enteredGoalText) {
+    // should be called when the button is clicked
+    setCourseGoals([{ text: enteredGoalText, id: uuid() }, ...courseGoals]); // react provides 'currentCourseGoals' automatically as a parameter when setCourseGoals is called
   }
 
-  function addGoalHandler() {
-    // should be called when the button is clicked
-    setCourseGoals([...courseGoals, enteredGoalText]); // react provides 'currentCourseGoals' automatically as a parameter when setCourseGoals is called
+  function deleteGoalHandler(id) {
+    setCourseGoals((currentCourseGoals) => {
+      return currentCourseGoals.filter((goal) => goal.id !== id);
+    });
   }
 
   return (
     <View style={styles.appContainer}>
       <View style={styles.inputContainer}>
-        <TextInput
-          placeholder="Your course goal!"
-          style={styles.textInput}
-          onChangeText={goalInputHandler}
-        />
-        <Button onPress={addGoalHandler} title="Add Goal"></Button>
+        <GoalInput onAddGoal={addGoalHandler} />
       </View>
       <View style={styles.goalsContainer}>
-        {courseGoals.map((goal) => (
-          <View style={styles.goalsText} key={uuid()}>
-            <Text style={{ color: "white" }}>{goal}</Text>
-          </View>
-        ))}
+        <FlatList
+          data={courseGoals}
+          renderItem={(itemData) => {
+            return (
+              <GoalItem
+                onPress={deleteGoalHandler}
+                text={itemData.item.text}
+                id={itemData.item.id}
+              />
+            );
+          }}
+        />
       </View>
     </View>
   );
@@ -63,14 +67,6 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   goalsContainer: {
-    flex: 4,
-  },
-  goalsText: {
-    color: "white",
-    borderRadius: 6,
-    backgroundColor: "#1D9999",
-    padding: 8,
-    margin: 8,
-    alignItems: "center",
+    flex: 3,
   },
 });
