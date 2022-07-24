@@ -6,3 +6,4 @@ Goal Tracker designed to add and delete to-do tasks. Add tasks using the text in
 ```
 npm start
 ```
+Download ExpoGO, and scan the QR code.
